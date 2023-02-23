@@ -3,6 +3,7 @@ const { response, request } = require("express");
 const userGet = (req = request, res = response) => {
   const {q, lname='No lname', apikey} = req.query;
 
+  //Ex: /api/users?q=...&lname=...&apikey=...
   res.json({
     msg: "get API - controller",
     q,
@@ -14,6 +15,7 @@ const userGet = (req = request, res = response) => {
 const userPost = (req, res = response) => {
   const { name, age } = req.body;
 
+  //Ex: /api/users and some settings in Postman (Body/raw/JSON)
   res.json({
     msg: "post API - controller",
     name,
@@ -24,6 +26,7 @@ const userPost = (req, res = response) => {
 const userPut = (req, res = response) => {
   const { id } = req.params;
 
+   //Ex: /api/users/125
   res.json({
     msg: "put API - controller",
     id,
