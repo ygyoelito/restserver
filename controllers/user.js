@@ -17,7 +17,7 @@ const userPost = (req, res = response) => {
   res.json({
     msg: "post API - controller",
     name,
-    age,
+    age,    
   });
 };
 
