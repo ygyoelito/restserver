@@ -1,19 +1,65 @@
 const { Router } = require("express");
+const { check } = require("express-validator");
+
+const { fieldsValidator } = require("../middlewares/fieldValidator");
+const {
+  isRoleValid,
+  emailExist,
+  userByIdExist,
+} = require("../helpers/db-validators");
 
 const {
   userGet,
   userPost,
   userPut,
   userPatch,
-  userDelete
+  userDelete,
 } = require("../controllers/user");
 
 const router = Router();
 
 router.get("/", userGet);
-router.post("/", userPost);
-router.put("/:id", userPut);
+
+router.post(
+  "/",
+  [
+    check("name", "Name is Mandatory").not().isEmpty(),
+    check(
+      "password",
+      "Password is mandatory and must be contain more of 6 characters"
+    ).isLength({ min: 6 }),
+    check("email", "Invalid Email").isEmail(),
+    check("email").custom(emailExist),
+
+    //A. check('role', "Role not valid").isIn(['ADMIN_ROLE', 'USER_ROLE', 'SALES_ROLE']), //validation against string
+    //B. check('role').custom((rol) => isRoleValid(rol)), //validation against db, optimized below by eliminating unnecessary arguments
+    check("role").custom(isRoleValid), //B. (enhanced!)
+
+    fieldsValidator,
+  ],
+  userPost
+);
+
+router.put(
+  "/:id",
+  [
+    check("id", "Invalid ID").isMongoId(),
+    check("id").custom(userByIdExist),
+    check("role").custom(isRoleValid),
+    fieldsValidator,
+  ],
+  userPut
+);
+
 router.patch("/", userPatch);
-router.delete("/", userDelete);
+
+router.delete(
+  "/:id",
+  [
+    check("id", "Invalid ID").isMongoId(),
+    check("id").custom(userByIdExist),
+    fieldsValidator
+  ],
+  userDelete);
 
 module.exports = router;

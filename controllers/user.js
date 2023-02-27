@@ -1,36 +1,50 @@
 const { response, request } = require("express");
+const User = require("../models/user");
+const { encryptPassword } = require("../helpers/db-validators");
 
-const userGet = (req = request, res = response) => {
-  const {q, lname='No lname', apikey} = req.query;
+const userGet = async (req = request, res = response) => {
+  const { limit = 3, from = 0 } = req.query;
+  const query = { status: true };
 
-  //Ex: /api/users?q=...&lname=...&apikey=...
-  res.json({
-    msg: "get API - controller",
-    q,
-    lname,
-    apikey
-  });
+  /*const users = await User.find( query )
+    .skip(Number(from))
+    .limit(Number(limit));
+  const total = await User.countDocuments( query );*/
+  
+  const [total, users] = await Promise.all(
+    [
+      User.countDocuments(query),
+      User.find( query )
+          .skip(Number(from))
+          .limit(Number(limit))
+    ]);
+
+  res.json({ total, users });
 };
 
-const userPost = (req, res = response) => {
-  const { name, age } = req.body;
+const userPost = async (req, res = response) => {
+  const { name, email, password, img, role, status, google } = req.body;
+  const user = new User({ name, email, password, img, role, status, google });
+  // Other way for above code: const body = req.body; const user = new User(body);
 
-  //Ex: /api/users and some settings in Postman (Body/raw/JSON)
-  res.json({
-    msg: "post API - controller",
-    name,
-    age,    
-  });
+  user.password = encryptPassword(password);
+
+  await user.save();
+
+  res.json({ user });
 };
 
-const userPut = (req, res = response) => {
+const userPut = async (req, res = response) => {
   const { id } = req.params;
+  const { _id, password, google, email, ...others } = req.body;
 
-   //Ex: /api/users/125
-  res.json({
-    msg: "put API - controller",
-    id,
-  });
+  if (password) {
+    others.password = encryptPassword(password);
+  }
+
+  const userToUpdate = await User.findByIdAndUpdate(id, others);
+
+  res.json({ userToUpdate });
 };
 
 const userPatch = (req, res = response) => {
@@ -39,9 +53,17 @@ const userPatch = (req, res = response) => {
   });
 };
 
-const userDelete = (req, res = response) => {
+const userDelete = async (req, res = response) => {
+  const { id } = req.params;
+  
+  //Physically delete the record (not recomended)
+  //const user_deleted = await User.findByIdAndDelete(id);
+
+  //Eliminate the record by changing the status of one of its fields
+  const user_deleted = await User.findByIdAndUpdate (id, {status:false});
+
   res.json({
-    msg: "delete API - controller",
+    user_deleted
   });
 };
 
