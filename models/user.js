@@ -33,7 +33,8 @@ const UserSchema = Schema({
 })
 
 UserSchema.methods.toJSON = function() {
-    const {__v, password, ... userToExport} = this.toObject();
+    const {__v, password, _id, ... userToExport} = this.toObject();
+    userToExport.uid = _id; //Just creating an alias of '_id' to 'uid'
     return userToExport;
 }
 

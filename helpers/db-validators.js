@@ -33,7 +33,6 @@ const encryptPassword = (password) => {
   return bcryptjs.hashSync(password, salt);  
 }
 
-
 module.exports = {
   isRoleValid,
   emailExist,

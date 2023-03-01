@@ -1,7 +1,13 @@
 const { Router } = require("express");
 const { check } = require("express-validator");
 
-const { fieldsValidator } = require("../middlewares/fieldValidator");
+const {
+  fieldsValidator,
+  validateJWT,
+  isAdminRole,
+  hasRole,
+} = require("../middlewares/index");
+
 const {
   isRoleValid,
   emailExist,
@@ -56,10 +62,14 @@ router.patch("/", userPatch);
 router.delete(
   "/:id",
   [
+    validateJWT,
+    //isAdminRole, //fuerza a que sea un rol de administrador para ejecutarse
+    hasRole("ADMIN_ROLE", "SALES_ROLE"), //fuerza a que sea un conjunto de roles para ejecutarse
     check("id", "Invalid ID").isMongoId(),
     check("id").custom(userByIdExist),
-    fieldsValidator
+    fieldsValidator,
   ],
-  userDelete);
+  userDelete
+);
 
 module.exports = router;

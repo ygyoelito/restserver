@@ -3,21 +3,18 @@ const User = require("../models/user");
 const { encryptPassword } = require("../helpers/db-validators");
 
 const userGet = async (req = request, res = response) => {
-  const { limit = 3, from = 0 } = req.query;
+  const { limit = 5, from = 0 } = req.query;
   const query = { status: true };
 
   /*const users = await User.find( query )
     .skip(Number(from))
     .limit(Number(limit));
   const total = await User.countDocuments( query );*/
-  
-  const [total, users] = await Promise.all(
-    [
-      User.countDocuments(query),
-      User.find( query )
-          .skip(Number(from))
-          .limit(Number(limit))
-    ]);
+
+  const [total, users] = await Promise.all([
+    User.countDocuments(query),
+    User.find(query).skip(Number(from)).limit(Number(limit)),
+  ]);
 
   res.json({ total, users });
 };
@@ -55,15 +52,18 @@ const userPatch = (req, res = response) => {
 
 const userDelete = async (req, res = response) => {
   const { id } = req.params;
-  
+
+  //Eliminate the record by changing the status of one of its fields
+  const user_deleted = await User.findByIdAndUpdate(id, { status: false });
+
+  const userAuth = req.userAuthenticated; //Authenticated user uid
+
   //Physically delete the record (not recomended)
   //const user_deleted = await User.findByIdAndDelete(id);
 
-  //Eliminate the record by changing the status of one of its fields
-  const user_deleted = await User.findByIdAndUpdate (id, {status:false});
-
   res.json({
-    user_deleted
+    user_deleted,
+    userAuth,
   });
 };
 
