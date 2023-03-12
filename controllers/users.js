@@ -33,28 +33,23 @@ const userPost = async (req, res = response) => {
 
 const userPut = async (req, res = response) => {
   const { id } = req.params;
-  const { _id, password, google, email, ...others } = req.body;
+  const { _id, password, google, status, role, ...others } = req.body;
 
   if (password) {
     others.password = encryptPassword(password);
   }
 
-  const userToUpdate = await User.findByIdAndUpdate(id, others);
+  const userToUpdate = await User.findByIdAndUpdate(id, others, {new: true});
 
   res.json({ userToUpdate });
 };
 
-const userPatch = (req, res = response) => {
-  res.json({
-    msg: "patch API - controller",
-  });
-};
 
 const userDelete = async (req, res = response) => {
   const { id } = req.params;
 
   //Eliminate the record by changing the status of one of its fields
-  const user_deleted = await User.findByIdAndUpdate(id, { status: false });
+  const user_deleted = await User.findByIdAndUpdate(id, { status: false }, {new: true});
 
   const userAuth = req.userAuthenticated; //Authenticated user uid
 
@@ -71,6 +66,5 @@ module.exports = {
   userGet,
   userPost,
   userPut,
-  userPatch,
   userDelete,
 };

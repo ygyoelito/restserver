@@ -18,9 +18,8 @@ const {
   userGet,
   userPost,
   userPut,
-  userPatch,
   userDelete,
-} = require("../controllers/user");
+} = require("../controllers/users");
 
 const router = Router();
 
@@ -56,8 +55,6 @@ router.put(
   ],
   userPut
 );
-
-router.patch("/", userPatch);
 
 router.delete(
   "/:id",
