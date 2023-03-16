@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const colors = require("colors");
+const color = require("colors");
+const fileUpload = require('express-fileupload');
 const { dbConnection } = require("../database/config");
+
 
 class Server {
   constructor() {
@@ -15,6 +17,7 @@ class Server {
       categories: '/api/categories',
       products: '/api/products',
       search: '/api/search',
+      upload: '/api/upload',
     }
 
     //Database Connection
@@ -39,7 +42,14 @@ class Server {
     this.app.use(express.json());
 
     //Public Directory
-    this.app.use(express.static("public"));    
+    this.app.use(express.static("public"));
+    
+    //Upload file
+    this.app.use(fileUpload({
+      useTempFiles : true,
+      tempFileDir : '/tmp/',
+      createParentPath: true
+  }));
   }
 
   routes() {
@@ -48,11 +58,12 @@ class Server {
     this.app.use(this.paths.categories, require('../routes/categories'));
     this.app.use(this.paths.products, require('../routes/products'));    
     this.app.use(this.paths.search, require('../routes/search'));
+    this.app.use(this.paths.upload, require('../routes/uploads'));
   }
 
   listen() {
     this.app.listen(this.port, () => {
-      console.log(`Server running in port ${this.port}`.red);
+      console.log(`Server running in port ${this.port}`.blue);
     });
   }
 }

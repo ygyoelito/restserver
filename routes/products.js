@@ -11,7 +11,7 @@ const {
 
 const { validateJWT, fieldsValidator, isAdminRole } = require("../middlewares");
 
-const { productByIdExist, categoryByIdExist } = require("../helpers/db-validators");
+const { productByIdExist, categoryByIdExist } = require("../helpers/dbValidators");
 
 const router = Router();
 

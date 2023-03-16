@@ -62,6 +62,17 @@ const productByIdExist = async (id = "") => {
   }
 };
 
+//Validate allowed collections
+const collectionsAllowed = (collection = '', collections = []) => {
+  const isInclude = collections.includes(collection);
+
+  if (!isInclude) {
+    throw new Error (`Collection \'${collection}\' is not allowed. Only ${collections} is allowed`)
+  }
+
+  return true;
+}
+
 
 module.exports = {
   isRoleValid,
@@ -70,5 +81,6 @@ module.exports = {
   userByIdExist,
   categoryByIdExist,
   categoryExist,
-  productByIdExist
+  productByIdExist,
+  collectionsAllowed
 };

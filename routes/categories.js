@@ -6,7 +6,7 @@ const { validateJWT, fieldsValidator, isAdminRole } = require("../middlewares");
 const {
   categoryByIdExist,
   categoryExist,
-} = require("../helpers/db-validators");
+} = require("../helpers/dbValidators");
 
 const {
   createCategory,
